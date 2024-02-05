@@ -10,7 +10,7 @@ export default function WeatherIcon(
   return (
     <div
       //  {...props}
-      className={cn('relative h-24 w-24')}
+      className={cn('relative h-20 w-20 md:h-24 md:w-24')}
     >
       <Image
         width={150}
