@@ -1,13 +1,8 @@
 import { ForecastWeatherDetailProps } from '@/types/types';
 import WeatherIcon from './WeatherIcon';
-import TodayWeather from './CurrentWeather';
-import CurrentWeather from './CurrentWeather';
-import { Calendar, ChevronsDown, ChevronsUp } from 'lucide-react';
+import { ChevronsDown, ChevronsUp } from 'lucide-react';
 import { convertKelvinToCelcius } from '@/utils/convertTemp';
 import WeatherDetails from './WeatherDetails';
-import { URL } from 'url';
-import { url } from 'inspector';
-
 type Props = {};
 
 export default function ForecastWeather(props: ForecastWeatherDetailProps) {

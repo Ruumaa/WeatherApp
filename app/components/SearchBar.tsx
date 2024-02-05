@@ -12,7 +12,7 @@ export default function SearchBar(className?: HTMLAttributes<string>) {
   const [error, setError] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const [place, setPlace] = useAtom(placeAtom);
+  const [_, setPlace] = useAtom(placeAtom);
 
   const handleChange = async (value: string) => {
     setCity(value);

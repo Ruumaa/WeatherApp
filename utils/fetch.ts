@@ -1,10 +1,8 @@
 import { WeatherData } from '@/types/types';
-import useSWR from 'swr';
 const tokenId = process.env.NEXT_PUBLIC_WEATHER_KEY;
 
 export const getDataWeather = async () => {
   try {
-    // const [place, setPlace] = useAtom(placeAtom);
     const data: Response = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?q=pune&appid=${tokenId}&cnt=56`
     );
@@ -21,7 +19,6 @@ export const getInputWeather = async (value: string) => {
       `https://api.openweathermap.org/data/2.5/find?q=${value}&appid=${tokenId}`
     );
     const dataResult: WeatherData = await data.json();
-    console.log(dataResult);
     return dataResult;
   } catch (error) {
     console.error('Error when getInputWeather', error);

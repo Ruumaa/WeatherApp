@@ -1,5 +1,5 @@
 'use client';
-import { fetcher, getDataWeather } from '@/utils/fetch';
+import { fetcher } from '@/utils/fetch';
 import Navbar from './components/Navbar';
 import { format, fromUnixTime, parseISO } from 'date-fns';
 import { convertKelvinToCelcius } from '@/utils/convertTemp';
@@ -10,7 +10,7 @@ import { mToKm } from '@/utils/mToKm';
 import { convertWind } from '@/utils/convertWind';
 import ForecastWeather from './components/ForecastWeather';
 import CurrentWeather from './components/CurrentWeather';
-import { WeatherData, WeatherResponse } from '@/types/types';
+import { WeatherResponse } from '@/types/types';
 import GetWeather, { tokenId } from '@/utils/fetchClient';
 import { useAtom } from 'jotai';
 import { placeAtom } from '@/utils/atom';

@@ -13,14 +13,6 @@ import { HTMLAttributes, ReactNode } from 'react';
 type Props = {};
 
 export default function WeatherDetails(props: WeatherDetailProps) {
-  // const {
-  //   visability = '25km',
-  //   humidity = '61%',
-  //   windSpeed = '7km/h',
-  //   airPressure = '1012 hPa',
-  //   sunrise = '6:20',
-  //   sunset = '18:48',
-  // } = props;
   return (
     <>
       <div className="flex w-full items-center gap-4 h-full justify-between">
