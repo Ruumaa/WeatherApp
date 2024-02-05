@@ -1,26 +1,11 @@
 'use client';
+import { placeAtom } from '@/utils/atom';
+// import { placeAtom } from '@/utils/atom';
 import { cn } from '@/utils/cn';
 import { getInputWeather } from '@/utils/fetch';
-import { placeAtom } from '@/utils/jotai';
 import { useAtom } from 'jotai';
 import { Search } from 'lucide-react';
-import {
-  ChangeEventHandler,
-  FC,
-  FormEvent,
-  FormEventHandler,
-  HTMLAttributes,
-  ReactNode,
-  SetStateAction,
-  useState,
-} from 'react';
-
-// type Props = {
-//   className?: string;
-// value: string;
-// onChange: ChangeEventHandler<HTMLInputElement> | undefined;
-// onSubmit: FormEventHandler<HTMLFormElement> | undefined;
-// };
+import { FormEvent, HTMLAttributes, useState } from 'react';
 
 export default function SearchBar(className?: HTMLAttributes<string>) {
   const [city, setCity] = useState<string>('');
@@ -70,18 +55,18 @@ export default function SearchBar(className?: HTMLAttributes<string>) {
         type="text"
         value={city}
         className={cn(
-          'px-4 py-2 h-full rounded-l-lg w-3/4 border-2 border-orange-800 focus:outline-none focus:border-orange-600',
+          'px-4 py-2 h-full rounded-l-lg w-full border-2 focus:outline-none border-orange-600 bg-primary/40 focus:border-orange-700 focus:bg-primary transition ease-out duration-300',
           className?.className
         )}
         placeholder="Search location..."
         onChange={(e) => handleChange(e.target.value)}
       />
-      <button className="px-4 py-[9px] h-full bg-orange-600 rounded-r-lg focus:outline-none hover:bg-orange-700">
+      <button className="px-4 py-[9px] h-full bg-orange-600 rounded-r-lg focus:outline-none hover:bg-orange-700 transition ease-in-out duration-300">
         <Search />
       </button>
       {/* <SuggestionBox /> */}
       {((showSuggestions && suggestions.length > 1) || error) && (
-        <ul className="mb-4 bg-secondary absolute border top-[44px] left-0 border-gray-300 rounded-md min-w-[200px] flex flex-col gap-1 p-2">
+        <ul className="mb-4 bg-primary absolute border top-[44px] left-0 border-orange-600 rounded-md w-4/6 flex flex-col gap-1 p-2">
           {error && suggestions.length < 1 && (
             <li className="text-error p-1">{error}</li>
           )}
@@ -89,7 +74,7 @@ export default function SearchBar(className?: HTMLAttributes<string>) {
             <li
               key={index}
               onClick={() => handleClick(suggestion)}
-              className="cursor-pointer p-1 rounded hover:bg-gray-200"
+              className="cursor-pointer p-1 rounded hover:bg-orange-600 hover:text-black transition ease-out duration-300"
             >
               {suggestion}
             </li>

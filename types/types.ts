@@ -69,6 +69,12 @@ export interface WeatherDetailProps {
   sunset: string;
 }
 
+export interface WeatherResponse {
+  data?: WeatherData;
+  error?: any;
+  isLoading: boolean;
+}
+
 export interface ForecastWeatherDetailProps extends WeatherDetailProps {
   weatherIcon: string;
   date: string;

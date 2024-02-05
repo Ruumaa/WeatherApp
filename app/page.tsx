@@ -1,4 +1,5 @@
-import { GetDataWeather } from '@/utils/fetch';
+'use client';
+import { fetcher, getDataWeather } from '@/utils/fetch';
 import Navbar from './components/Navbar';
 import { format, fromUnixTime, parseISO } from 'date-fns';
 import { convertKelvinToCelcius } from '@/utils/convertTemp';
@@ -9,15 +10,49 @@ import { mToKm } from '@/utils/mToKm';
 import { convertWind } from '@/utils/convertWind';
 import ForecastWeather from './components/ForecastWeather';
 import CurrentWeather from './components/CurrentWeather';
+import { WeatherData, WeatherResponse } from '@/types/types';
+import GetWeather, { tokenId } from '@/utils/fetchClient';
 import { useAtom } from 'jotai';
-import { placeAtom } from '@/utils/jotai';
-import { useHydrateAtoms } from 'jotai/utils';
+import { placeAtom } from '@/utils/atom';
+import { useEffect } from 'react';
+import { preload } from 'swr';
 
-export default async function Home() {
-  // const [place, setPlace] = useAtom(placeAtom);
-  const data = await GetDataWeather();
-  const firsData = data?.list[0];
-  // console.log(firsData);
+export default function Home() {
+  const [place, _] = useAtom(placeAtom);
+
+  const response: WeatherResponse = GetWeather(place);
+  useEffect(() => {
+    preload(
+      `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${tokenId}&cnt=56`,
+      fetcher
+    );
+  }, [place]);
+
+  // response.isLoading = true;
+  if (response.isLoading) {
+    return (
+      <>
+        <Navbar location={place} />
+        <div className="w-full flex items-center flex-col gap-5 mt-7 min-h-screen p-10 ">
+          <div className="skeleton bg-primary h-52 w-full"></div>
+          <div className="flex w-full gap-5">
+            <div className="skeleton bg-primary h-52 w-1/4"></div>
+            <div className="skeleton bg-primary h-52 w-full"></div>
+          </div>
+          <div className="skeleton bg-primary h-52 w-full"></div>
+          <div className="skeleton bg-primary h-52 w-full"></div>
+          <div className="skeleton bg-primary h-52 w-full"></div>
+          <div className="skeleton bg-primary h-52 w-full"></div>
+          <div className="skeleton bg-primary  h-52 w-full"></div>
+          <div className="skeleton bg-primary h-52 w-full"></div>
+          <div className="skeleton bg-primary h-52 w-full"></div>
+        </div>
+      </>
+    );
+  }
+
+  const data = response.data;
+  const firstData = data?.list[0];
   const uniqueCode = [
     ...new Set(
       data?.list.map(
@@ -28,32 +63,40 @@ export default async function Home() {
   ];
 
   const firstDataForEachDate = uniqueCode.map((date) => {
-    return data?.list.find((entry) => {
+    return data?.list.find((entry: any) => {
       const entryDate = new Date(entry.dt * 1000).toISOString().split('T')[0];
       const entryTime = new Date(entry.dt * 1000).getHours();
       return entryDate === date && entryTime >= 6;
     });
   });
+  let filteredArray = firstDataForEachDate.filter(
+    (uniqueDate) => uniqueDate !== undefined
+  );
+
   return (
     <>
-      <Navbar />
+      <Navbar location={place} />
       <main className="flex flex-col gap-10 min-h-screen mx-7">
         {/* today data */}
         <section>
-          <h2 className="text-xl my-4">
-            {format(parseISO(firsData?.dt_txt ?? ''), 'EEEE, MMMM do')}
+          <h2 className="text-2xl md:text-4xl my-4 font-semibold font-sans">
+            {format(parseISO(firstData?.dt_txt ?? ''), 'EEEE, MMMM do')}
           </h2>
           <div className="h-52 w-full flex items-center bg-primary rounded-lg shadow-lg p-4 whitespace-nowrap">
             {' '}
-            <div className=" w-1/4 h-full items-center justify-center flex flex-col text-center">
+            <div
+              className=" w-1/4 h-full md:items-center justify-center flex flex-col text-center text-wrap md:text-nowrap pr-2 md:pr-0 
+            
+            "
+            >
               <CurrentWeather
-                temp={firsData?.main.temp ?? 297.65}
-                feels_like={firsData?.main.feels_like ?? 298.3}
-                temp_min={firsData?.main.temp_min ?? 297.02}
-                temp_max={firsData?.main.temp_max ?? 297.65}
+                temp={firstData?.main.temp ?? 297.65}
+                feels_like={firstData?.main.feels_like ?? 298.3}
+                temp_min={firstData?.main.temp_min ?? 297.02}
+                temp_max={firstData?.main.temp_max ?? 297.65}
               />
             </div>
-            <div className=" w-full h-full overflow-x-auto overflow-y-auto items-center flex gap-10 px-2">
+            <div className=" w-full h-full overflow-x-auto overflow-y-hidden items-center flex gap-5 md:gap-10 px-2">
               {data?.list.map((dataList, index) => (
                 <div
                   key={index}
@@ -78,23 +121,23 @@ export default async function Home() {
         </section>
         {/* Weather Details */}
         <section className="w-full h-52 flex items-center rounded-lg font-semibold">
-          <div className="w-1/4 bg-orange-600 h-full rounded-lg shadow-lg flex items-center flex-col justify-center p-4 hover:bg-primary text-base-100 hover:text-slate-300  transition ease-out duration-300  ">
-            <h3 className="text-2xl mb-2 text-center capitalize">
-              {firsData?.weather[0].description}
+          <div className="w-1/3 md:w-1/4 bg-orange-600 h-full rounded-lg shadow-lg flex items-center flex-col justify-center p-2 md:p-4 hover:bg-primary text-base-100 hover:text-slate-300  transition ease-out duration-300  ">
+            <h3 className="text-xl -mb-2 md:text-2xl md:mb-2 text-center md:text-center capitalize">
+              {firstData?.weather[0].description}
             </h3>
             <WeatherIcon
               iconName={getDayorNight(
-                firsData?.weather[0].icon ?? '',
-                firsData?.dt_txt ?? ''
+                firstData?.weather[0].icon ?? '',
+                firstData?.dt_txt ?? ''
               )}
             />
           </div>
-          <div className="ml-10 gap-10 overflow-y-hidden overflow-x-auto w-full h-full flex items-center justify-around bg-primary rounded-lg shadow-lg p-6 whitespace-nowrap">
+          <div className="ml-10 gap-10 overflow-y-hidden overflow-x-auto w-2/3 md:w-full h-full flex items-center justify-between bg-primary rounded-lg shadow-lg p-6 whitespace-nowrap ">
             <WeatherDetails
-              visability={mToKm(firsData?.visibility ?? 10000)}
-              humidity={`${firsData?.main.humidity} %`}
-              windSpeed={convertWind(firsData?.wind.speed ?? 4.09)}
-              airPressure={`${firsData?.main.pressure} hPa`}
+              visability={mToKm(firstData?.visibility ?? 10000)}
+              humidity={`${firstData?.main.humidity} %`}
+              windSpeed={convertWind(firstData?.wind.speed ?? 4.09)}
+              airPressure={`${firstData?.main.pressure} hPa`}
               sunrise={format(
                 fromUnixTime(data?.city.sunrise ?? 1706665111),
                 'H:mm'
@@ -107,15 +150,17 @@ export default async function Home() {
           </div>
         </section>
 
-        {/* 7 days forecast */}
-        <h2 className="text-xl mt-4 -mb-5">Forecast 7 days</h2>
+        {/* forecast */}
+        <h2 className="text-2xl md:text-4xl mt-4 -mb-5 font-semibold font-sans">
+          Forecast
+        </h2>
         <div>
-          {firstDataForEachDate.map((uniqueDate, index) => (
+          {filteredArray.map((uniqueDate, index) => (
             <ForecastWeather
               key={index}
               description={uniqueDate?.weather[0].description ?? ''}
               weatherIcon={uniqueDate?.weather[0].icon ?? '01d'}
-              date={format(parseISO(uniqueDate?.dt_txt ?? ''), 'dd.MM')}
+              date={format(parseISO(uniqueDate?.dt_txt ?? ''), 'MMMM d')}
               day={format(parseISO(uniqueDate?.dt_txt ?? ''), 'EEEE')}
               feels_like={uniqueDate?.main.feels_like ?? 0}
               temp={uniqueDate?.main.temp ?? 0}
